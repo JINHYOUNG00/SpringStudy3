@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div>
+		<h3>게시판 목록</h3>
+		<table>
+			<thead>
+			<tr>
+				<th>번호</th>
+				<th>제목</th>
+				<th>작성자</th>
+				<th>작성일</th><!-- yy년MM월dd일 -->
+			</tr>
+			</thead>
+			<tbody>
+			<th:block th:each="board : ${blist}">
+				<tr>
+					<td th:text="${board.boardNo}"></td>
+					<td th:text="${board.boardTitle}"></td>
+					<td th:text="${board.boardWriter}"></td>
+					<td th:text="${#dates.format(board.regdate, 'yy년MM월dd일')}"></td>
+				</tr>
+			</th:block>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
