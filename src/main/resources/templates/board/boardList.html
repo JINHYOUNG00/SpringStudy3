@@ -1,32 +1,74 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Insert title here</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+	rel="stylesheet" />
+<style>
+.table-container {
+	margin-top: 20px;
+}
+
+.table-header {
+	background-color: #f8f9fa;
+	padding: 10px;
+	border-bottom: 1px solid #dee2e6;
+}
+</style>
 </head>
 <body>
-	<div>
-		<h3>게시판 목록</h3>
-		<table>
+	<div class="container table-container">
+		<div class="table-header">
+			<h3>게시판 목록</h3>
+		</div>
+		<table class="table table-striped">
 			<thead>
-			<tr>
-				<th>번호</th>
-				<th>제목</th>
-				<th>작성자</th>
-				<th>작성일</th><!-- yy년MM월dd일 -->
-			</tr>
+				<tr>
+					<th>번호</th>
+					<th>제목</th>
+					<th>작성자</th>
+					<th>작성일</th>
+					<!-- yy년MM월dd일 -->
+				</tr>
 			</thead>
 			<tbody>
-			<th:block th:each="board : ${blist}">
-				<tr>
+				<tr th:each="board : ${blist}">
 					<td th:text="${board.boardNo}"></td>
 					<td th:text="${board.boardTitle}"></td>
 					<td th:text="${board.boardWriter}"></td>
 					<td th:text="${#dates.format(board.regdate, 'yy년MM월dd일')}"></td>
 				</tr>
-			</th:block>
 			</tbody>
 		</table>
+		<div class="content-footer">
+			<button class="btn btn-primary">등록</button>
+		</div>
 	</div>
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+		integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('tbody > tr').on('click', function(e) {
+				if (e.target.tagName == 'BUTTON')
+					return;
+				let boardNo = $(e.currentTarget).children().first().text();
+				let url = '/board/' + boardNo;
+				//  let url = '/boardInfo?boardNo=' + boardNo;
+
+				location.href = url;
+			});
+		$('.content-footer > button').on('click',function() {
+			location.href = 'board/save';
+		})	
+			
+		});
+	</script>
 </body>
 </html>

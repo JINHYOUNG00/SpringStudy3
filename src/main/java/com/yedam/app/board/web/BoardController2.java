@@ -53,13 +53,13 @@ public class BoardController2 {
 	
 	// 게시글 등록
 	@PostMapping("/save")
-	public String boardInsert(@RequestBody BoardVO boardVO) {
+	public String boardInsert(BoardVO boardVO) {
 		int bno = boardService.saveBoard(boardVO);
-		return "redirect:board/" + bno;
+		return "redirect:" + bno;
 	}
 	
 	// 게시글 수정 (페이지)
-	@GetMapping("/edit/{boardNo}")
+	@GetMapping("/{boardNo}/edit")
 	public String boardUpdateForm(@PathVariable Integer boardNo, Model model) {
 		BoardVO boardVO = new BoardVO();
 		boardVO.setBoardNo(boardNo);
@@ -70,7 +70,7 @@ public class BoardController2 {
 	
 	
 	// 게시글 수정
-	@PostMapping("/edit/{boardNo}")
+	@PostMapping("/{boardNo}/edit")
 	@ResponseBody
 	public Map<String, Object> boardUpdate(@RequestBody BoardVO boardVO, @PathVariable Integer boardNo) {
 		boardVO.setBoardNo(boardNo);
@@ -79,10 +79,10 @@ public class BoardController2 {
 	}
 	
 	// 게시글 삭제
-	@GetMapping("/delete/{boardNo}")
+	@GetMapping("/{boardNo}/delete")
 	public String boardDelete(@PathVariable Integer boardNo) {
 		boardService.removeBoard(boardNo);
-		return "redirect:board";
+		return "redirect:/board";
 	}
 	
 	

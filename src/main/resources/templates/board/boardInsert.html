@@ -3,8 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+	rel="stylesheet">
+<style>
+.form-container {
+	margin-top: 20px;
+}
+
+.form-header {
+	background-color: #f8f9fa;
+	padding: 10px;
+	border-bottom: 1px solid #dee2e6;
+}
+
+.form-body {
+	padding: 20px;
+	background-color: #ffffff;
+	border: 1px solid #dee2e6;
+}
+
+.form-footer {
+	background-color: #f8f9fa;
+	padding: 10px;
+	border-top: 1px solid #dee2e6;
+	text-align: right;
+}
+</style>
 </head>
 <body>
-	<h1>게시판 등록</h1>
+	<div class="container form-container">
+		<div class="form-header">
+			<h5>게시글 입력</h5>
+		</div>
+		<form class="form-body" method="post" action="/board/save">
+			<div class="mb-3">
+				<label for="boardTitle" class="form-label">제목</label> <input
+					type="text" class="form-control" id="boardTitle" name="boardTitle"
+					required>
+			</div>
+			<div class="mb-3">
+				<label for="boardWriter" class="form-label">작성자</label> <input
+					type="text" class="form-control" id="boardWriter"
+					name="boardWriter" required>
+			</div>
+			<div class="mb-3">
+				<label for="boardContent" class="form-label">내용</label>
+				<textarea class="form-control" id="boardContent" name="boardContent"
+					rows="5" required></textarea>
+			</div>
+			<div class="form-footer">
+				<button type="submit" class="btn btn-primary">등록</button>
+				<button type="button" class="btn btn-secondary"
+					onclick="history.back()">취소</button>
+			</div>
+		</form>
+		<form action="uploadForm" method="post" enctype="multipart/form-data">
+			<input type="file" name="images" multiple>
+			<button type="submit">저장</button>
+		</form>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

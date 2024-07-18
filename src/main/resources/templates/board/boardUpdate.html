@@ -3,8 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            margin-top: 20px;
+        }
+        .form-header {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .form-body {
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+        }
+        .form-footer {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-top: 1px solid #dee2e6;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-	<h1>게시판 수정</h1>
+	<div class="container form-container">
+        <div class="form-header">
+            <h5>게시글 수정</h5>
+        </div>
+        <form name="updateForm" class="form-body" method="post" action="/edit">
+            <input type="hidden" name="boardNo" th:value="${board.boardNo}">
+            <div class="mb-3">
+                <label for="boardTitle" class="form-label">제목</label>
+                <input type="text" class="form-control" id="boardTitle" name="boardTitle" th:value="${board.boardTitle}" required>
+            </div>
+            <div class="mb-3">
+                <label for="boardWriter" class="form-label">작성자</label>
+                <input type="text" class="form-control" id="boardWriter" name="boardWriter" th:value="${board.boardWriter}" required>
+            </div>
+            <div class="mb-3">
+                <label for="boardContent" class="form-label">내용</label>
+                <textarea class="form-control" id="boardContent" name="boardContent" rows="5" required th:text="${board.boardContent}"><!-- 기존 내용 --></textarea>
+            </div>
+            <div class="form-footer">
+                <button type="button" class="btn btn-primary" id="modBtn">수정</button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
+            </div>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+    	$('#modBtn').on('click', modHandler);
+    	
+    	
+    	function modHandler(){
+    		if(validationCheck() == false) return;
+    		
+    		let dataObj = getBoardObj();
+    		
+    		
+    		$.ajax('edit', {
+    			type: 'post',
+    			contentType: 'application/json',
+    			data : JSON.stringify(dataObj)
+    		})
+    			.done(result => {
+    				console.log(result);
+    				if(result.result) {
+						alert('수정완료');
+    					location.href = '/board/' + result.target.boardNo;
+    				}
+    			})
+    			.fail(err => {
+    				console.log(err);
+    			})
+    	}
+    	
+    	function validationCheck() {
+			let btitle = $('[name="boardTitle"]');
+			if (btitle.val() == '') {
+				alert('제목은 필수 값 입니다.');
+				btitle.focus();
+				return false;
+			}
+
+			let bwriter = $('[name="boardWriter"]');
+			if (bwriter.val() == '') {
+				alert('제목은 필수 값 입니다.');
+				bwriter.focus();
+				return false;
+			}
+			let bcontent = $('[name="boardContent"]');
+			if (bcontent.text() == '') {
+				alert('내용은 필수 값 입니다.');
+				bcontent.focus();
+				return false;
+			}
+			return true;
+		}
+    	
+    	function getBoardObj() {
+			let formAry = $('form[name="updateForm"]').serializeArray();
+			// serializeArray() 사용 시 form의 값이 표현됨
+			// [
+			//		{ name : 'empid', value : '209'},
+			//  	{ name : 'empname', value : 'Hong'}, ...
+			//  ]
+			//  => javascript 에선 FormData
+			console.log(formAry);
+
+			//위의 형식에서 서버단에서 받을 수 있는 형식으로 포맷을 바꿔줘야함
+			let formObj = {};
+			// {empid : 209, ename: 'Hong', ...}
+			$.each(formAry, function (idx, input) {
+				// input = {name : 'empid', value : '209'}
+				formObj[input.name] = input.value;
+				// formObj['empid'] = '209';
+
+				// formObj => {empid : 209, empname : 'Hong', ...}
+			});
+			return formObj;
+		}
+    </script>
 </body>
 </html>
