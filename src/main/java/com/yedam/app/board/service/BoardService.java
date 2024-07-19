@@ -11,6 +11,7 @@ public interface BoardService {
 	public BoardVO boardInfo(BoardVO boardVO);
 	// 게시판 등록
 	public int saveBoard(BoardVO boardVO);
+
 	// 게시판 수정
 	public Map<String, Object> editBoard(BoardVO boardVO);
 	// 게시판 삭제

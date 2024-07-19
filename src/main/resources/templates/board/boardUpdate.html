@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	   layout:decorate="~{common/layouts/default_layout}"
+	   layout:fragment="content">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
@@ -31,19 +34,27 @@
         <div class="form-header">
             <h5>게시글 수정</h5>
         </div>
-        <form name="updateForm" class="form-body" method="post" action="/edit">
-            <input type="hidden" name="boardNo" th:value="${board.boardNo}">
+        <form name="updateForm" class="form-body" method="post" action="/edit" th:object="${board}">
+            <input type="hidden" th:field="*{boardNo}">
             <div class="mb-3">
                 <label for="boardTitle" class="form-label">제목</label>
-                <input type="text" class="form-control" id="boardTitle" name="boardTitle" th:value="${board.boardTitle}" required>
+                <input type="text" class="form-control" id="boardTitle" th:field="*{boardTitle}" required>
             </div>
             <div class="mb-3">
                 <label for="boardWriter" class="form-label">작성자</label>
-                <input type="text" class="form-control" id="boardWriter" name="boardWriter" th:value="${board.boardWriter}" required>
+                <input type="text" class="form-control" id="boardWriter" th:field="*{boardWriter}" required>
             </div>
             <div class="mb-3">
                 <label for="boardContent" class="form-label">내용</label>
-                <textarea class="form-control" id="boardContent" name="boardContent" rows="5" required th:text="${board.boardContent}"><!-- 기존 내용 --></textarea>
+                <textarea class="form-control" id="boardContent" rows="5" required th:field="*{boardContent}"><!-- 기존 내용 --></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="image" class="form-label">첨부파일</label>
+                <input type="text" class="form-control" id="image" th:field="*{image}" required>
+            </div>
+            <div class="mb-3">
+                <label for="boardWriter" class="form-label">작성일자</label>
+                <input type="date" class="form-control" th:field="*{regdate}" readonly="readonly">
             </div>
             <div class="form-footer">
                 <button type="button" class="btn btn-primary" id="modBtn">수정</button>
@@ -54,7 +65,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript">
-    	$('#modBtn').on('click', modHandler);
+    	/* $('#modBtn').on('click', modHandler);
     	
     	
     	function modHandler(){
@@ -78,7 +89,43 @@
     			.fail(err => {
     				console.log(err);
     			})
-    	}
+    	} */
+    	
+		$('#modBtn').on('click', boardUpdateAjax);
+		
+		function boardUpdateAjax(event){
+			//1) 보낼 데이터 확인
+			let info = getBoardInfo();
+			
+			//2) AJAX
+			$.ajax('edit',{
+				type:'post',
+				contentType : 'application/json',
+				data : JSON.stringify(info)
+			})
+			.done(data => {
+				if(data.result){
+					alert('정상적으로 수정되었습니다.');
+				}else{
+					alert('수정되지 않았습니다.\n데이터를 확인해주세요.');
+				}
+			})
+			.fail(err => console.log(err));			
+		};
+	
+		function getBoardInfo(){
+			let formData= $('form[name="updateForm"]').serializeArray();
+			console.log('1) serializeArray', formData);
+			
+			let objData = {};
+			$.each(formData, (idx, input) => {
+				console.log('2) input', idx, input);
+				objData[input.name] = input.value;
+			});
+			
+			console.log('3) objData', objData);
+			return objData;
+		};
     	
     	function validationCheck() {
 			let btitle = $('[name="boardTitle"]');
@@ -125,6 +172,8 @@
 			});
 			return formObj;
 		}
+    	
+    	
     </script>
 </body>
 </html>

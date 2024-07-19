@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<!-- common/fragments/default_header.html -->
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="defaultHeader">
+	<!-- 전체조회, 등록 -->
+	<ul class="nav justify-content-end">
+		<li class="nav-item"><a class="nav-link active"
+			aria-current="page" th:href="@{/board}">전체조회</a></li>
+		<li class="nav-item"><a class="nav-link" th:href="@{/board/save}">등록</a></li>
+	</ul>
+</th:block>
+
+</html>

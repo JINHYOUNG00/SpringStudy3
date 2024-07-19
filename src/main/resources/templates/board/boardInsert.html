@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	   layout:decorate="~{common/layouts/default_layout}"
+	   layout:fragment="content">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
@@ -36,7 +39,7 @@
 		<div class="form-header">
 			<h5>게시글 입력</h5>
 		</div>
-		<form class="form-body" method="post" action="/board/save">
+		<form name="insertForm" class="form-body" method="post" th:action>
 			<div class="mb-3">
 				<label for="boardTitle" class="form-label">제목</label> <input
 					type="text" class="form-control" id="boardTitle" name="boardTitle"
@@ -48,23 +51,52 @@
 					name="boardWriter" required>
 			</div>
 			<div class="mb-3">
+				<label for="image" class="form-label">첨부 파일</label> <input
+					type="text" class="form-control" id="image" name="image" required>
+			</div>
+			<div class="mb-3">
 				<label for="boardContent" class="form-label">내용</label>
 				<textarea class="form-control" id="boardContent" name="boardContent"
 					rows="5" required></textarea>
 			</div>
 			<div class="form-footer">
 				<button type="submit" class="btn btn-primary">등록</button>
-				<button type="button" class="btn btn-secondary"
-					onclick="history.back()">취소</button>
+				<button type="button" class="btn btn-secondary" onclick="goList()">취소</button>
 			</div>
 		</form>
-		<form action="uploadForm" method="post" enctype="multipart/form-data">
+		<!-- <form action="uploadForm" method="post" enctype="multipart/form-data">
 			<input type="file" name="images" multiple>
 			<button type="submit">저장</button>
-		</form>
+		</form> -->
 	</div>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript">
+		function goList() {
+			location.href = `/board/`
+		}
+
+		insertForm.addEventListener('submit',boardInsertHandler);
+
+		function boardInsertHandler(e) {
+			e.preventDefault();
+
+			let boardTitle = document.querySelector('input[name="boardTitle"]');
+			if (boardTitle.value == '') {
+				alert('제목은 필수입니다.');
+				boardTitle.focus();
+				return;
+			}
+			let boardWriter = document
+					.querySelector('input[name="boardWriter"]');
+			if (boardWriter.value == '') {
+				alert('작성자는 필수입니다.');
+				boardWriter.focus();
+				return;
+			}
+			insertForm.submit();
+		}
+	</script>
 </body>
 </html>

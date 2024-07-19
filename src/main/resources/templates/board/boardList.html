@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	   layout:decorate="~{common/layouts/default_layout}"
+	   layout:fragment="content">
 <head>
 <meta charset="UTF-8" />
 <title>Insert title here</title>
@@ -34,16 +37,18 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="board : ${blist}">
-					<td th:text="${board.boardNo}"></td>
-					<td th:text="${board.boardTitle}"></td>
-					<td th:text="${board.boardWriter}"></td>
-					<td th:text="${#dates.format(board.regdate, 'yy년MM월dd일')}"></td>
-				</tr>
+				<th:block th:each="board, boardStat : ${blist}">
+					<tr th:name=${boardStat.index} th:onclick="|location.href='@{/board/{boardNo} (boardNo=${board.boardNo}) }'|">
+						<td th:text="${board.boardNo}"></td>
+						<td th:text="${board.boardTitle}"></td>
+						<td th:text="${board.boardWriter}"></td>
+						<td th:text="${#dates.format(board.regdate, 'yy년MM월dd일')}"></td>
+					</tr>
+				</th:block>
 			</tbody>
 		</table>
 		<div class="content-footer">
-			<button class="btn btn-primary">등록</button>
+			<button class="btn btn-primary" th:onclick="|location.href='/board/save'|">등록</button>
 		</div>
 	</div>
 
@@ -55,7 +60,9 @@
 		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			$('tbody > tr').on('click', function(e) {
+			
+			// th:onclick="|location.href='@{/board/{boardNo} (boardNo=${board.boardNo}) }'|"
+			/* $('tbody > tr').on('click', function(e) {
 				if (e.target.tagName == 'BUTTON')
 					return;
 				let boardNo = $(e.currentTarget).children().first().text();
@@ -63,11 +70,12 @@
 				//  let url = '/boardInfo?boardNo=' + boardNo;
 
 				location.href = url;
-			});
-		$('.content-footer > button').on('click',function() {
-			location.href = 'board/save';
-		})	
-			
+			}); */
+			// th:onclick="|location.href='/board/save'|"
+		/* 	$('.content-footer > button').on('click', function() {
+				location.href = '/board/save';
+			})
+ */
 		});
 	</script>
 </body>

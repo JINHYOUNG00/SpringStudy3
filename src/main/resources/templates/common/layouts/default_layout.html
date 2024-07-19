@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!-- common/layouts/default_layout.html -->
+<html xmlns:th="http://www.thymeleaf.org"
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<!-- configs -->
+<!-- th:replace 사용 시 대체함 -->
+<!-- 페이지 => viewResolver :: fragment 이름 => th:fragment -->
+<th:block th:replace="common/configs/default_config :: defaultConfig"></th:block>
+<title>Insert title here</title>
+</head>
+<body>
+<!-- fragments -->
+	<div class="container">
+	<!-- th:insert는 추가하려는 fragment가 헤더의 하위요소로 들어가게함 -->
+		<header th:insert="common/fragments/default_header :: defaultHeader">
+		</header>
+			<main layout:fragment="content">
+			
+			</main>
+	</div>
+</body>
+</html>
