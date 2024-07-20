@@ -21,17 +21,17 @@ import com.yedam.app.board.service.BoardVO;
 import com.yedam.app.common.service.UploadService;
 
 import lombok.RequiredArgsConstructor;
-
-
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/board")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController2 {
-	
+
 	private final BoardService boardService;
 	private final UploadService uploadService;
-	
+
 	// 게시판 리스트
 	@GetMapping
 	public String boardList(Model model) {
@@ -39,7 +39,7 @@ public class BoardController2 {
 		model.addAttribute("blist", boardList);
 		return "/board/boardList";
 	}
-	
+
 	// 단건 조회
 	@GetMapping("/{boardNo}")
 	public String boardInfo(@PathVariable Integer boardNo, Model model) {
@@ -49,37 +49,41 @@ public class BoardController2 {
 		model.addAttribute("board", board);
 		return "/board/boardInfo";
 	}
-	
+
 	// 게시글 등록 (페이지)
 	@GetMapping("/save")
 	public String boardInsertForm() {
 		return "/board/boardInsert";
 	}
-	
-	
+
 	private String setImagePath(String uploadFileName) {
 		return uploadFileName.replace(File.separator, "/");
 	}
-	
+
 	// 게시글 등록
 	@PostMapping("/save")
 	public String boardInsert(BoardVO boardVO, @RequestPart MultipartFile[] uploadFiles) {
-		
 		List<String> imageList = new ArrayList<>();
-		
+
 		int bno = boardService.saveBoard(boardVO);
-		int i = 0;
-		for (MultipartFile uploadFile : uploadFiles) {
-			String savePath = uploadService.imageUpload(uploadFile, "BOARD", (long)bno, i);
-			boardVO.setImage(savePath);
-			imageList.add(setImagePath(savePath));
-			i++;
+		// 파일 업로드 첫번째 값의 용량?이 0일때는 파일업로드 진행 안함
+		if (uploadFiles[0].getSize() != 0) {
+			log.info("uploadFiles length={}", uploadFiles.length);
+			for (MultipartFile multipartFile : uploadFiles) {
+				log.info("uploadFiles size={}", multipartFile.getSize());
+			}
+			int i = 0;
+			for (MultipartFile uploadFile : uploadFiles) {
+				String savePath = uploadService.imageUpload(uploadFile, "BOARD", (long) bno, i);
+				boardVO.setImage(savePath);
+				imageList.add(setImagePath(savePath));
+				i++;
+			}
 		}
-		
-		
+
 		return "redirect:" + bno;
 	}
-	
+
 	// 게시글 수정 (페이지)
 	@GetMapping("/{boardNo}/edit")
 	public String boardUpdateForm(@PathVariable Integer boardNo, Model model) {
@@ -89,8 +93,7 @@ public class BoardController2 {
 		model.addAttribute("board", board);
 		return "/board/boardUpdate";
 	}
-	
-	
+
 	// 게시글 수정
 	@PostMapping("/{boardNo}/edit")
 	@ResponseBody
@@ -99,13 +102,12 @@ public class BoardController2 {
 		Map<String, Object> editBoard = boardService.editBoard(boardVO);
 		return editBoard;
 	}
-	
+
 	// 게시글 삭제
 	@GetMapping("/{boardNo}/delete")
 	public String boardDelete(@PathVariable Integer boardNo) {
 		boardService.removeBoard(boardNo);
 		return "redirect:/board";
 	}
-	
-	
+
 }
