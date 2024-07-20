@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.yedam.app.board.service.BoardService;
 import com.yedam.app.board.service.BoardVO;
 import com.yedam.app.common.service.UploadService;
+import com.yedam.app.common.service.UploadedFileVO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,12 @@ public class BoardController2 {
 		boardVO.setBoardNo(boardNo);
 		BoardVO board = boardService.boardInfo(boardVO);
 		model.addAttribute("board", board);
+		List<UploadedFileVO> images = uploadService.selectFilesByDomain("BOARD", (long)boardNo);
+		log.info("imageName={}",images.get(0).getFileName());
+		model.addAttribute("flist", images);
 		return "/board/boardInfo";
 	}
+	
 
 	// 게시글 등록 (페이지)
 	@GetMapping("/save")
@@ -56,30 +61,12 @@ public class BoardController2 {
 		return "/board/boardInsert";
 	}
 
-	private String setImagePath(String uploadFileName) {
-		return uploadFileName.replace(File.separator, "/");
-	}
-
 	// 게시글 등록
 	@PostMapping("/save")
 	public String boardInsert(BoardVO boardVO, @RequestPart MultipartFile[] uploadFiles) {
-		List<String> imageList = new ArrayList<>();
-
 		int bno = boardService.saveBoard(boardVO);
-		// 파일 업로드 첫번째 값의 용량?이 0일때는 파일업로드 진행 안함
-		if (uploadFiles[0].getSize() != 0) {
-			log.info("uploadFiles length={}", uploadFiles.length);
-			for (MultipartFile multipartFile : uploadFiles) {
-				log.info("uploadFiles size={}", multipartFile.getSize());
-			}
-			int i = 0;
-			for (MultipartFile uploadFile : uploadFiles) {
-				String savePath = uploadService.imageUpload(uploadFile, "BOARD", (long) bno, i);
-				boardVO.setImage(savePath);
-				imageList.add(setImagePath(savePath));
-				i++;
-			}
-		}
+		// 파일 업로드 처리 // 파일 배열과, 게시판 유형, 글번호를 넣어줘야함.
+		uploadService.imageUpload(uploadFiles, "BOARD", (long)bno);
 
 		return "redirect:" + bno;
 	}

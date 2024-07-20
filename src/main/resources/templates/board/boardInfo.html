@@ -60,10 +60,12 @@
                             </div>
                         <div class="row">
                             <div class="col-md-2"><strong>첨부이미지:</strong></div>
+                     	<th:block th:each="file : ${flist}">
                             <div class="col-md-10">
                            		 <!-- /images/cat.jpg -->
-                            	<img width="50%" th:src="@{/images/{fileName}(fileName=${board.image})}">
+                            	<img width="50%" th:src="@{/images/{fileName}(fileName=${file.filePath})}">
                             </div>
+                        </th:block>
                         </div>
                         </div>
                     </div>

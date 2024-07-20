@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,56 +26,75 @@ import lombok.RequiredArgsConstructor;
 public class UploadServiceImpl implements UploadService {
 	@Value("${file.upload.path}")
 	private String uploadPath;
-	
-	private final UploadMapper uploadedFileMapper;
-	
-	@Override
-	public String imageUpload(MultipartFile uploadFile, String domainType, Long domainId, int fileOrder) {
-		if(!uploadFile.getContentType().startsWith("image")){
-    		System.err.println("this file is not image type");
-    		return null;
-        }
-  
-        String originalName = uploadFile.getOriginalFilename();
-        String fileName = originalName.substring(originalName.lastIndexOf("//")+1);
-        
-        //날짜 폴더 생성
-        String folderPath = makeFolder();
-        
-        //UUID
-        String uuid = UUID.randomUUID().toString();
-        
-        //저장할 파일 이름 중간에 "_"를 이용하여 구분
-        String uploadFileName = folderPath +File.separator + uuid + "_" + fileName;
-        
-        String saveName = uploadPath + File.separator + uploadFileName;
-        
-        Path savePath = Paths.get(saveName);
-        //Paths.get() 메서드는 특정 경로의 파일 정보를 가져옵니다.(경로 정의하기)
-        System.out.println("path : " + saveName);
-        try{
-        	uploadFile.transferTo(savePath);
-            //uploadFile에 파일을 업로드 하는 메서드 transferTo(file)
-        } catch (IOException e) {
-             e.printStackTrace();	             
-        }
-        
-        // 파일 정보를 데이터베이스에 저장
-        UploadedFileVO uploadedFile = new UploadedFileVO();
-        uploadedFile.setFileName(fileName);
-        uploadedFile.setFileType(uploadFile.getContentType());
-        uploadedFile.setFileSize(uploadFile.getSize());
-        uploadedFile.setUploadTime(LocalDateTime.now());
-        uploadedFile.setFilePath(uploadFileName);
-        uploadedFile.setDomainType(domainType);
-        uploadedFile.setDomainId(domainId);
-        uploadedFile.setFileOrder(fileOrder);
 
-        uploadedFileMapper.insertUploadedFile(uploadedFile);
-        
-        return saveName;
+	private final UploadMapper uploadedFileMapper;
+
+	@Override
+	public String imageUpload(MultipartFile[] uploadFiles, String domainType, Long domainId) {
+
+		String saveName = "";
+		// 파일 업로드 첫번째 값의 용량?이 0일때는 파일업로드 진행 안함
+//		if (uploadFiles[0].getSize() != 0) {
+		int i = 0;
+		for (MultipartFile uploadFile : uploadFiles) {
+			if (!uploadFile.getContentType().startsWith("image")) {
+				System.err.println("this file is not image type");
+				return null;
+			}
+
+			String originalName = uploadFile.getOriginalFilename();
+			String fileName = originalName.substring(originalName.lastIndexOf("//") + 1);
+
+			// 날짜 폴더 생성
+			String folderPath = makeFolder();
+
+			// UUID
+			String uuid = UUID.randomUUID().toString();
+
+			// 저장할 파일 이름 중간에 "_"를 이용하여 구분
+			String uploadFileName = folderPath + File.separator + uuid + "_" + fileName;
+
+			// 파일이 저장되는 이름
+			String realUploadFilename = uuid + "_" + fileName;
+
+			saveName = uploadPath + File.separator + uploadFileName;
+
+			Path savePath = Paths.get(saveName);
+			// Paths.get() 메서드는 특정 경로의 파일 정보를 가져옵니다.(경로 정의하기)
+			System.out.println("path : " + saveName);
+			try {
+				uploadFile.transferTo(savePath);
+				// uploadFile에 파일을 업로드 하는 메서드 transferTo(file)
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// 경로에 \를 /로 변환작업
+			String uploadFileName2 = setImagePath(uploadFileName);
+			// 파일 정보를 데이터베이스에 저장
+			UploadedFileVO uploadedFile = new UploadedFileVO();
+			uploadedFile.setFileName(fileName);
+			uploadedFile.setFileType(uploadFile.getContentType());
+			uploadedFile.setFileSize(uploadFile.getSize());
+			uploadedFile.setUploadTime(LocalDateTime.now());
+			uploadedFile.setFilePath(uploadFileName2);
+			uploadedFile.setDomainType(domainType);
+			uploadedFile.setDomainId(domainId);
+			uploadedFile.setFileOrder(i);
+
+			uploadedFileMapper.insertUploadedFile(uploadedFile);
+//				imageList.add();
+			i++;
+		}
+//		}
+
+		return saveName;
 	}
-	
+
+	@Override
+	public List<UploadedFileVO> selectFilesByDomain(String domainType, Long domainId) {
+		return uploadedFileMapper.selectFilesByDomain(domainType, domainId);
+	}
+
 	private String makeFolder() {
 		String str = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 		// LocalDate를 문자열로 포멧
@@ -88,4 +109,9 @@ public class UploadServiceImpl implements UploadService {
 		}
 		return folderPath;
 	}
+
+	private String setImagePath(String uploadFileName) {
+		return uploadFileName.replace(File.separator, "/");
+	}
+
 }
