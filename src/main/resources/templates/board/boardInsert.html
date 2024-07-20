@@ -39,7 +39,7 @@
 		<div class="form-header">
 			<h5>게시글 입력</h5>
 		</div>
-		<form name="insertForm" class="form-body" method="post" th:action>
+		<form name="insertForm" class="form-body" method="post" th:action enctype="multipart/form-data">
 			<div class="mb-3">
 				<label for="boardTitle" class="form-label">제목</label> <input
 					type="text" class="form-control" id="boardTitle" name="boardTitle"
@@ -52,7 +52,7 @@
 			</div>
 			<div class="mb-3">
 				<label for="image" class="form-label">첨부 파일</label> <input
-					type="text" class="form-control" id="image" name="image" required>
+					type="file" class="form-control" id="files" name="uploadFiles" required multiple>
 			</div>
 			<div class="mb-3">
 				<label for="boardContent" class="form-label">내용</label>

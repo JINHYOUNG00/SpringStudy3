@@ -1,5 +1,7 @@
 package com.yedam.app.board.web;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.yedam.app.board.service.BoardService;
 import com.yedam.app.board.service.BoardVO;
+import com.yedam.app.common.service.UploadService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class BoardController2 {
 	
 	private final BoardService boardService;
+	private final UploadService uploadService;
 	
 	// 게시판 리스트
 	@GetMapping
@@ -51,10 +57,26 @@ public class BoardController2 {
 	}
 	
 	
+	private String setImagePath(String uploadFileName) {
+		return uploadFileName.replace(File.separator, "/");
+	}
+	
 	// 게시글 등록
 	@PostMapping("/save")
-	public String boardInsert(BoardVO boardVO) {
+	public String boardInsert(BoardVO boardVO, @RequestPart MultipartFile[] uploadFiles) {
+		
+		List<String> imageList = new ArrayList<>();
+		
 		int bno = boardService.saveBoard(boardVO);
+		int i = 0;
+		for (MultipartFile uploadFile : uploadFiles) {
+			String savePath = uploadService.imageUpload(uploadFile, "BOARD", (long)bno, i);
+			boardVO.setImage(savePath);
+			imageList.add(setImagePath(savePath));
+			i++;
+		}
+		
+		
 		return "redirect:" + bno;
 	}
 	
