@@ -38,4 +38,15 @@
 		WHERE domain_type = #{domainType} AND domain_id = #{domainId}
 		ORDER BY file_order ASC
 	</select>
+	
+	<select id="selectFilePathsByBoard" resultType="String">
+		SELECT file_path 
+		FROM uploaded_files
+		WHERE domain_type = #{domainType} AND domain_id = #{domainId}
+	</select>
+	
+	<delete id="deleteFilesByDomain">
+		DELETE FROM uploaded_files
+		WHERE domain_type = #{domainType} AND domain_id = #{domainId}
+	</delete>
 </mapper>

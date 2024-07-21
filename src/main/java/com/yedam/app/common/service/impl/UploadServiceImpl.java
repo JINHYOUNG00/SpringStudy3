@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,8 +19,10 @@ import com.yedam.app.common.service.UploadService;
 import com.yedam.app.common.service.UploadedFileVO;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
 	@Value("${file.upload.path}")
@@ -88,6 +89,47 @@ public class UploadServiceImpl implements UploadService {
 //		}
 
 		return saveName;
+	}
+
+	// 이미지 업데이트
+	@Override
+	public String imageUpdate(MultipartFile[] uploadFiles, String domainType, Long domainId) {
+//		if (uploadFiles != null && uploadFiles.length > 0) {
+//			// 기존 파일 삭제
+//			List<String> filePaths = uploadedFileMapper.selectFilePathsByBoard(domainType, domainId);
+//			for (String filePath : filePaths) {
+//				File file = new File(uploadPath + filePath);
+//				if (file.exists()) {
+//					file.delete();
+//				}
+//			}
+//			uploadedFileMapper.deleteFilesByDomain(domainType, (long)domainId);
+//
+//			// 새 파일 업로드
+//			List<String> newFilePaths = new ArrayList<>();
+//			imageUpload(uploadFiles, domainType, (long) domainId);
+//		}
+		if (uploadFiles != null && uploadFiles.length > 0) {
+	        // 기존 파일 삭제
+	        List<String> filePaths = uploadedFileMapper.selectFilePathsByBoard(domainType, domainId);
+	        for (String filePath : filePaths) {
+	            File file = new File(uploadPath + filePath);
+	            if (file.exists()) {
+	                if (file.delete()) {
+	                    log.info("기존 파일 삭제 성공: {}", filePath);
+	                } else {
+	                    log.error("기존 파일 삭제 실패: {}", filePath);
+	                }
+	            }
+	        }
+	        uploadedFileMapper.deleteFilesByDomain(domainType, domainId);
+
+	        // 새 파일 업로드
+	        imageUpload(uploadFiles, domainType, domainId);
+	    } else {
+	        log.info("업로드된 파일이 없습니다.");
+	    }
+		return null;
 	}
 
 	@Override
