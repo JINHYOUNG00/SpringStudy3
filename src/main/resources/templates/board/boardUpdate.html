@@ -85,15 +85,16 @@
         if(!validationCheck()) return;
 
         let info = getBoardInfo();
-        let formData = new FormData();
-        formData.append("request", new Blob([JSON.stringify(info)], {type: "application/json"}));
-
-        let uploadFiles = document.getElementById('uploadFiles').files;
+        //let formData = new FormData();
+        //formData.append("request", new Blob([JSON.stringify(info)], {type: "application/json"}));
+		let formData = new FormData(document.querySelector('[name="updateForm"]')); // formData는 form을 지정해주면 그 속에 데이터들을 긁어서 가져와줌	
+        
+/*         let uploadFiles = document.getElementById('uploadFiles').files;
         if (uploadFiles && uploadFiles.length > 0) {
             for (let i = 0; i < uploadFiles.length; i++) {
                 formData.append("uploadFiles", uploadFiles[i]);
             }
-        }
+        } */
 
         $.ajax('/board/' + info.boardNo + '/edit', {
             type: 'POST',

@@ -82,7 +82,7 @@ public class BoardController2 {
 	// 게시글 수정
 	@PostMapping("/{boardNo}/edit")
 	@ResponseBody
-	public Map<String, Object> boardUpdate(@RequestPart BoardVO boardVO,
+	public Map<String, Object> boardUpdate(BoardVO boardVO,
 			@RequestPart(value = "uploadFiles") MultipartFile[] uploadFiles,
 			@PathVariable Integer boardNo) {
 		boardVO.setBoardNo(boardNo);
